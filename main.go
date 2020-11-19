@@ -1,9 +1,11 @@
 package main
 
 import (
+	"comment/dbops"
 	"comment/handler"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"time"
@@ -12,6 +14,23 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
 )
+
+func init() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("./")
+
+	viper.SetDefault("port", 9913)
+	viper.SetDefault("mongodbURL", "mongodb://127.0.0.1:27017/")
+	viper.SetDefault("mongodbName", "dada")
+
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			log.Fatalf("Fatal error config file: %s \n", err)
+		}
+	}
+	dbops.InitDBCollection()
+}
 
 func main() {
 	e := echo.New()
